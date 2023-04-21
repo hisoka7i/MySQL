@@ -21,38 +21,45 @@ CLOSE c1;
 end $
 delimiter ;
 
-
-/*Triggers for Inserting data, Data is inserted into table d */
-drop trigger if EXISTS tr1;
+/*Declaring a trigger after Insert*/
+drop TRIGGER if EXISTS tr1;
 delimiter $
-create trigger tr1 after insert on dept for each row
+create TRIGGER tr1 after insert on dept for each ROW
 BEGIN
 insert into d values (new.deptno, new.dname, new.loc, new.pwd, new.startedon);
 end $
 delimiter ;
 
-
-/*Trigger for Deleting data, deleted data is inserted into table d1*/
-drop trigger if EXISTS tr2;
+/*Declaring a trigger after delete*/
+drop TRIGGER if EXISTS tr2;
 delimiter $
-create trigger tr2 after delete on dept for each row
-BEGIN
-insert into d1 values (old.deptno, old.dname, old.loc, old.pwd, old.startedon);
+create TRIGGER tr2 after delete on dept for each ROW
+begin
+INSERT into d2 values (old.deptno, old.dname, old.loc, old.pwd, old.startedon);
 end $
 delimiter ;
 
 
-/*Creating a auto increment using trigger */
-drop trigger if exists tr3;
+/*Declaring a trigger before insert*/
+drop trigger if EXISTS tr3;
 delimiter $
-create trigger tr3 before insert on dept for each row
+create TRIGGER tr3 BEFORE INSERT on dept for EACH ROW
 BEGIN
-DECLARE x int default 0;
-select max(deptno)+1 into x from dept;
-set new.deptno=x;
-insert into d values (new.deptno, new.dname, new.loc, new.pwd, new.startedon);
+if time(now())<='13:26:00' THEN
+signal SQLSTATE '42000' set message_text="Time UP";
+end if;
 end $
 delimiter ;
 
 
 /**/
+drop trigger if EXISTS tr4;
+DELIMITER $
+create trigger tr4 after insert on dept for each ROW
+begin
+
+ insert into d3 values (new.deptno, new.dname, new.loc, new.pwd, new.startedon,  user(), time(now()));
+ end $
+ delimiter ;
+
+
